@@ -46,7 +46,7 @@ namespace personas.Controllers {
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<ServiceResponse<GetPersonaDto>>> GetPersona(int id)
+    public async Task<ActionResult<ServiceResponse<GetPersonaDto>>> DeletePersona(int id)
     {
       var response = await _personaService.DeletePersona(id);
       if (response.Data is null) {
