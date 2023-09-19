@@ -1,5 +1,8 @@
-global using personas;
+global using personas.Models;
+global using personas.Dtos.Persona;
 global using personas.Services.PersonaService;
+global using AutoMapper;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IPersonaService, PersonaService>();
 
 var app = builder.Build();

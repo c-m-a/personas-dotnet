@@ -8,31 +8,90 @@ namespace personas.Services.PersonaService
 {
   public class PersonaService : IPersonaService
   {
+    private readonly IMapper _mapper;
+
     private static List<Persona> personas = new List<Persona> {
       new Persona { Nombres = "Cmauricio" },
       new Persona { Id = 1, Nombres = "Carlos" }
     };
 
-    public async Task<ServiceResponse<List<Persona>>> AddPersona(Persona newPersona)
+    public PersonaService(IMapper mapper)
     {
-      var serviceResponse = new ServiceResponse<List<Persona>>();
-      personas.Add(newPersona);
-      serviceResponse.Data = personas;
+      _mapper = mapper;
+    }
+
+    public async Task<ServiceResponse<List<GetPersonaDto>>> AddPersona(AddPersonaDto newPersona)
+    {
+      var serviceResponse = new ServiceResponse<List<GetPersonaDto>>();
+      var persona = _mapper.Map<Persona>(newPersona);
+      persona.Id = personas.Max(p => p.Id) + 1;
+      personas.Add(persona);
+      serviceResponse.Data = personas.Select(p => _mapper.Map<GetPersonaDto>(p)).ToList();
       return serviceResponse;
     }
 
-    public async Task<ServiceResponse<List<Persona>>> GetAllPersonas()
+    public async Task<ServiceResponse<List<GetPersonaDto>>> GetAllPersonas()
     {
-      var serviceResponse = new ServiceResponse<List<Persona>>();
-      serviceResponse.Data = personas;
+      var serviceResponse = new ServiceResponse<List<GetPersonaDto>>();
+      serviceResponse.Data = personas.Select(p => _mapper.Map<GetPersonaDto>(p)).ToList();
       return serviceResponse;
     }
 
-    public async Task<ServiceResponse<Persona>> GetPersonaById(int id)
+    public async Task<ServiceResponse<GetPersonaDto>> GetPersonaById(int id)
     {
-      var serviceResponse = new ServiceResponse<Persona>();
+      var serviceResponse = new ServiceResponse<GetPersonaDto>();
       var persona = personas.FirstOrDefault(p => p.Id == id);
-      serviceResponse.Data = persona;
+      serviceResponse.Data = _mapper.Map<GetPersonaDto>(persona);
+      return serviceResponse;
+    }
+
+    public async Task<ServiceResponse<GetPersonaDto>> UpdatePersona(UpdatePersonaDto updatedPersona)
+    {
+      var serviceResponse = new ServiceResponse<GetPersonaDto>();
+
+      try {
+        var persona = personas.FirstOrDefault(p => p.Id == updatedPersona.Id);
+
+        if (persona is null)
+          throw new Exception($"Persona with Id '{updatedPersona.Id}' not found.");
+
+        _mapper.Map(updatedPersona, persona);
+
+        persona.Nombres = updatedPersona.Nombres;
+        persona.Apellidos = updatedPersona.Apellidos;
+        persona.Cedula = updatedPersona.Cedula;
+
+        serviceResponse.Data = _mapper.Map<GetPersonaDto>(persona);
+      }
+      catch (Exception ex)
+      {
+        serviceResponse.Success = false;
+        serviceResponse.Message = ex.Message;
+      }
+
+      return serviceResponse;
+    }
+
+    public async Task<ServiceResponse<List<GetPersonaDto>>> DeletePersona(int id)
+    {
+      var serviceResponse = new ServiceResponse<List<GetPersonaDto>>();
+
+      try {
+        var persona = personas.First(p => p.Id == id);
+
+        if (persona is null)
+          throw new Exception($"Persona with Id '{id}' not found.");
+
+        personas.Remove(persona);
+
+        serviceResponse.Data = personas.Select(p => _mapper.Map<GetPersonaDto>(p)).ToList();
+      }
+      catch (Exception ex)
+      {
+        serviceResponse.Success = false;
+        serviceResponse.Message = ex.Message;
+      }
+
       return serviceResponse;
     }
   }

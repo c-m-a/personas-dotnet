@@ -17,21 +17,43 @@ namespace personas.Controllers {
     }
 
     [HttpGet("GetAll")]
-    public async Task<ActionResult<ServiceResponse<List<Persona>>>> Get()
+    public async Task<ActionResult<ServiceResponse<List<GetPersonaDto>>>> Get()
     {
       return Ok(await _personaService.GetAllPersonas());
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ServiceResponse<Persona>>> GetSingle(int id)
+    public async Task<ActionResult<ServiceResponse<GetPersonaDto>>> GetSingle(int id)
     {
       return Ok(await _personaService.GetPersonaById(id));
     }
 
     [HttpPost]
-    public async Task<ActionResult<ServiceResponse<List<Persona>>>> AddPersona(Persona newPersona)
+    public async Task<ActionResult<ServiceResponse<List<GetPersonaDto>>>> AddPersona(AddPersonaDto newPersona)
     {
       return Ok(await _personaService.AddPersona(newPersona));
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<ServiceResponse<List<GetPersonaDto>>>> UpdatePersona(UpdatePersonaDto updatedPersona)
+    {
+      var response = await _personaService.UpdatePersona(updatedPersona);
+      if (response.Data is null) {
+        return NotFound(response);
+      }
+
+      return Ok(response);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<ServiceResponse<GetPersonaDto>>> GetPersona(int id)
+    {
+      var response = await _personaService.DeletePersona(id);
+      if (response.Data is null) {
+        return NotFound(response);
+      }
+
+      return Ok(response);
     }
   }
 }

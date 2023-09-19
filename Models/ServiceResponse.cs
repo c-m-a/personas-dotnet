@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-public class ServiceResponse<T>
-{
-  public T? Data { get; set; }
-  public bool Success { get; set; } = true;
-  public string Message { get; set; } = string.Empty;
+namespace personas.Models {
+  public class ServiceResponse<T>
+  {
+    public T? Data { get; set; }
+    public bool Success { get; set; } = true;
+    public string Message { get; set; } = string.Empty;
+  }
 }
 
