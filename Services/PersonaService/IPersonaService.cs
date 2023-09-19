@@ -8,9 +8,9 @@ namespace personas.Services.PersonaService
 {
   public interface IPersonaService
   {
-    Task<List<Persona>> GetAllPersonas();
-    Task<Persona> GetPersonaById(int id);
-    Task<List<Persona>> AddPersona(Persona newPersona);
+    Task<ServiceResponse<List<Persona>>> GetAllPersonas();
+    Task<ServiceResponse<Persona>> GetPersonaById(int id);
+    Task<ServiceResponse<List<Persona>>> AddPersona(Persona newPersona);
   }
 }
 

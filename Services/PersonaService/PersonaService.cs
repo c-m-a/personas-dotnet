@@ -13,25 +13,27 @@ namespace personas.Services.PersonaService
       new Persona { Id = 1, Nombres = "Carlos" }
     };
 
-    public async Task<List<Persona>> AddPersona(Persona newPersona)
+    public async Task<ServiceResponse<List<Persona>>> AddPersona(Persona newPersona)
     {
+      var serviceResponse = new ServiceResponse<List<Persona>>();
       personas.Add(newPersona);
-      return personas;
+      serviceResponse.Data = personas;
+      return serviceResponse;
     }
 
-    public async Task<List<Persona>> GetAllPersonas()
+    public async Task<ServiceResponse<List<Persona>>> GetAllPersonas()
     {
-      return personas;
+      var serviceResponse = new ServiceResponse<List<Persona>>();
+      serviceResponse.Data = personas;
+      return serviceResponse;
     }
 
-    public async Task<Persona> GetPersonaById(int id)
+    public async Task<ServiceResponse<Persona>> GetPersonaById(int id)
     {
+      var serviceResponse = new ServiceResponse<Persona>();
       var persona = personas.FirstOrDefault(p => p.Id == id);
-
-      if (persona is not null)
-        return persona;
-
-      throw new Exception("Persona not found");
+      serviceResponse.Data = persona;
+      return serviceResponse;
     }
   }
 }
