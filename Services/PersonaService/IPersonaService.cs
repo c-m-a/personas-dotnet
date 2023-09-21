@@ -10,7 +10,7 @@ namespace personas.Services.PersonaService
   {
     Task<ServiceResponse<List<GetPersonaDto>>> GetAllPersonas();
     Task<ServiceResponse<GetPersonaDto>> GetPersonaById(int id);
-    Task<ServiceResponse<List<GetPersonaDto>>> AddPersona(AddPersonaDto newPersona);
+    Task<ServiceResponse<GetPersonaDto>> AddPersona(AddPersonaDto newPersona);
     Task<ServiceResponse<GetPersonaDto>> UpdatePersona(UpdatePersonaDto updatedPersona);
     Task<ServiceResponse<List<GetPersonaDto>>> DeletePersona(int id);
   }
