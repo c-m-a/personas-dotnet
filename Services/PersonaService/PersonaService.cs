@@ -9,39 +9,44 @@ namespace personas.Services.PersonaService
   public class PersonaService : IPersonaService
   {
     private readonly IMapper _mapper;
+    private readonly DataContext _context;
 
     private static List<Persona> personas = new List<Persona> {
       new Persona { Nombres = "Cmauricio" },
       new Persona { Id = 1, Nombres = "Carlos" }
     };
 
-    public PersonaService(IMapper mapper)
+    public PersonaService(IMapper mapper, DataContext context)
     {
+      _context = context;
       _mapper = mapper;
     }
 
-    public async Task<ServiceResponse<List<GetPersonaDto>>> AddPersona(AddPersonaDto newPersona)
+    public async Task<ServiceResponse<GetPersonaDto>> AddPersona(AddPersonaDto newPersona)
     {
-      var serviceResponse = new ServiceResponse<List<GetPersonaDto>>();
+      var serviceResponse = new ServiceResponse<GetPersonaDto>();
       var persona = _mapper.Map<Persona>(newPersona);
-      persona.Id = personas.Max(p => p.Id) + 1;
-      personas.Add(persona);
-      serviceResponse.Data = personas.Select(p => _mapper.Map<GetPersonaDto>(p)).ToList();
+
+      _context.Personas.Add(persona);
+      await _context.SaveChangesAsync();
+
+      serviceResponse.Data = _mapper.Map<GetPersonaDto>(persona);
       return serviceResponse;
     }
 
     public async Task<ServiceResponse<List<GetPersonaDto>>> GetAllPersonas()
     {
       var serviceResponse = new ServiceResponse<List<GetPersonaDto>>();
-      serviceResponse.Data = personas.Select(p => _mapper.Map<GetPersonaDto>(p)).ToList();
+      var dbPersonas = await _context.Personas.ToListAsync();
+      serviceResponse.Data = dbPersonas.Select(p => _mapper.Map<GetPersonaDto>(p)).ToList();
       return serviceResponse;
     }
 
     public async Task<ServiceResponse<GetPersonaDto>> GetPersonaById(int id)
     {
       var serviceResponse = new ServiceResponse<GetPersonaDto>();
-      var persona = personas.FirstOrDefault(p => p.Id == id);
-      serviceResponse.Data = _mapper.Map<GetPersonaDto>(persona);
+      var dbPersona = await _context.Personas.FindAsync(id);
+      serviceResponse.Data = _mapper.Map<GetPersonaDto>(dbPersona);
       return serviceResponse;
     }
 
@@ -50,7 +55,8 @@ namespace personas.Services.PersonaService
       var serviceResponse = new ServiceResponse<GetPersonaDto>();
 
       try {
-        var persona = personas.FirstOrDefault(p => p.Id == updatedPersona.Id);
+        // var persona = personas.FirstOrDefault(p => p.Id == updatedPersona.Id);
+        var persona = await _context.Personas.FindAsync(updatedPersona.Id);
 
         if (persona is null)
           throw new Exception($"Persona with Id '{updatedPersona.Id}' not found.");
@@ -77,12 +83,14 @@ namespace personas.Services.PersonaService
       var serviceResponse = new ServiceResponse<List<GetPersonaDto>>();
 
       try {
-        var persona = personas.First(p => p.Id == id);
+        // var persona = personas.First(p => p.Id == id);
+        var persona = await _context.Personas.FindAsync(id);
 
         if (persona is null)
           throw new Exception($"Persona with Id '{id}' not found.");
 
-        personas.Remove(persona);
+        _context.Personas.Remove(persona);
+        await _context.SaveChangesAsync();
 
         serviceResponse.Data = personas.Select(p => _mapper.Map<GetPersonaDto>(p)).ToList();
       }
